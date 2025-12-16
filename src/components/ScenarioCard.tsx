@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
-import { Check, X, Sparkles } from "lucide-react";
+import { Check, Lightbulb, Sparkles, ArrowRight } from "lucide-react";
 
 interface Choice {
   id: string;
   text: string;
-  isCorrect: boolean;
+  effectiveness: "good" | "okay" | "tricky";
   feedback: string;
 }
 
@@ -15,13 +15,12 @@ interface ScenarioCardProps {
   context: string;
   emoji: string;
   choices: Choice[];
-  onComplete: (correct: boolean) => void;
+  onComplete: (wasEffective: boolean) => void;
 }
 
 export function ScenarioCard({ scenario, context, emoji, choices, onComplete }: ScenarioCardProps) {
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleSelect = (choiceId: string) => {
     if (showFeedback) return;
@@ -31,45 +30,62 @@ export function ScenarioCard({ scenario, context, emoji, choices, onComplete }: 
   const handleSubmit = () => {
     if (!selectedChoice) return;
     setShowFeedback(true);
-    setIsAnimating(true);
 
     const choice = choices.find(c => c.id === selectedChoice);
     setTimeout(() => {
-      onComplete(choice?.isCorrect ?? false);
+      onComplete(choice?.effectiveness === "good");
     }, 2000);
   };
 
   const selectedChoiceData = choices.find(c => c.id === selectedChoice);
-  const isCorrect = selectedChoiceData?.isCorrect ?? false;
+  const effectiveness = selectedChoiceData?.effectiveness ?? "okay";
+
+  const feedbackConfig = {
+    good: {
+      title: "Nice approach!",
+      emoji: "✨",
+      bgClass: "bg-success/10 border-success/20",
+      textClass: "text-success",
+    },
+    okay: {
+      title: "That could work!",
+      emoji: "💭",
+      bgClass: "bg-secondary/10 border-secondary/20",
+      textClass: "text-secondary",
+    },
+    tricky: {
+      title: "Something to think about",
+      emoji: "🤔",
+      bgClass: "bg-warning/10 border-warning/20",
+      textClass: "text-warning",
+    },
+  };
+
+  const config = feedbackConfig[effectiveness];
 
   return (
     <div className="w-full max-w-lg mx-auto p-4">
       {/* Scenario Card */}
-      <div
-        className={cn(
-          "bg-card rounded-3xl p-6 shadow-card mb-6 transition-all duration-300",
-          showFeedback && isCorrect && "animate-bounce-in border-2 border-success",
-          showFeedback && !isCorrect && "animate-shake border-2 border-destructive"
-        )}
-      >
+      <div className={cn(
+        "bg-card rounded-2xl p-5 border border-border/50 mb-6 transition-all duration-300",
+        showFeedback && "animate-bounce-in"
+      )}>
         {/* Context Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold mb-4">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-4">
           <span>{emoji}</span>
           <span>{context}</span>
         </div>
 
         {/* Scenario Text */}
-        <p className="text-foreground font-body text-lg leading-relaxed mb-2">
+        <p className="text-foreground font-body text-base leading-relaxed">
           {scenario}
         </p>
-
-        {/* Character illustration placeholder */}
-        <div className="flex justify-center my-4">
-          <div className="w-20 h-20 rounded-full gradient-primary flex items-center justify-center text-4xl animate-float shadow-glow">
-            {emoji}
-          </div>
-        </div>
       </div>
+
+      {/* Prompt text */}
+      <p className="text-sm text-muted-foreground mb-4 font-body">
+        What would you try? (No wrong answers here)
+      </p>
 
       {/* Choice Buttons */}
       <div className="space-y-3 mb-6">
@@ -79,26 +95,24 @@ export function ScenarioCard({ scenario, context, emoji, choices, onComplete }: 
             variant={selectedChoice === choice.id ? "choiceSelected" : "choice"}
             size="lg"
             className={cn(
-              "w-full text-left justify-start h-auto py-4 px-5 animate-slide-up",
-              showFeedback && choice.id === selectedChoice && isCorrect && "gradient-success border-success text-success-foreground",
-              showFeedback && choice.id === selectedChoice && !isCorrect && "bg-destructive/10 border-destructive text-destructive"
+              "w-full text-left justify-start h-auto py-4 px-4 animate-slide-up",
+              showFeedback && choice.id === selectedChoice && effectiveness === "good" && "bg-success/10 border-success",
+              showFeedback && choice.id === selectedChoice && effectiveness === "okay" && "bg-secondary/10 border-secondary",
+              showFeedback && choice.id === selectedChoice && effectiveness === "tricky" && "bg-warning/10 border-warning"
             )}
-            style={{ animationDelay: `${index * 100}ms` }}
+            style={{ animationDelay: `${index * 80}ms` }}
             onClick={() => handleSelect(choice.id)}
             disabled={showFeedback}
           >
-            <span className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">
+            <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-bold mr-3 flex-shrink-0">
               {String.fromCharCode(65 + index)}
             </span>
-            <span className="flex-1 font-body">{choice.text}</span>
-            {showFeedback && choice.id === selectedChoice && (
-              <span className="ml-2">
-                {isCorrect ? (
-                  <Check className="w-6 h-6 text-success-foreground animate-success-pop" />
-                ) : (
-                  <X className="w-6 h-6 text-destructive animate-wiggle" />
-                )}
-              </span>
+            <span className="flex-1 font-body text-sm">{choice.text}</span>
+            {showFeedback && choice.id === selectedChoice && effectiveness === "good" && (
+              <Check className="w-5 h-5 text-success ml-2" />
+            )}
+            {showFeedback && choice.id === selectedChoice && effectiveness !== "good" && (
+              <Lightbulb className="w-5 h-5 text-warning ml-2" />
             )}
           </Button>
         ))}
@@ -106,24 +120,17 @@ export function ScenarioCard({ scenario, context, emoji, choices, onComplete }: 
 
       {/* Feedback Section */}
       {showFeedback && selectedChoiceData && (
-        <div
-          className={cn(
-            "p-4 rounded-2xl mb-6 animate-bounce-in",
-            isCorrect ? "bg-success/10 border border-success/30" : "bg-destructive/10 border border-destructive/30"
-          )}
-        >
+        <div className={cn(
+          "p-4 rounded-2xl mb-6 animate-slide-up border",
+          config.bgClass
+        )}>
           <div className="flex items-start gap-3">
-            <span className="text-2xl">
-              {isCorrect ? "🎉" : "💡"}
-            </span>
+            <span className="text-xl">{config.emoji}</span>
             <div>
-              <p className={cn(
-                "font-display font-bold mb-1",
-                isCorrect ? "text-success" : "text-destructive"
-              )}>
-                {isCorrect ? "Great job!" : "Almost there!"}
+              <p className={cn("font-display font-bold mb-1 text-sm", config.textClass)}>
+                {config.title}
               </p>
-              <p className="text-sm text-muted-foreground font-body">
+              <p className="text-sm text-muted-foreground font-body leading-relaxed">
                 {selectedChoiceData.feedback}
               </p>
             </div>
@@ -135,21 +142,22 @@ export function ScenarioCard({ scenario, context, emoji, choices, onComplete }: 
       {!showFeedback ? (
         <Button
           variant="default"
-          size="xl"
+          size="lg"
           className="w-full"
           onClick={handleSubmit}
           disabled={!selectedChoice}
         >
-          <Sparkles className="w-5 h-5 mr-2" />
-          Check Answer
+          See what happens
+          <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       ) : (
         <Button
-          variant={isCorrect ? "success" : "accent"}
-          size="xl"
+          variant="default"
+          size="lg"
           className="w-full"
         >
-          {isCorrect ? "Continue" : "Try Again"}
+          Try another one
+          <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       )}
     </div>

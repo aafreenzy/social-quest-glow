@@ -1,4 +1,4 @@
-import { Home, BookOpen, Trophy, User } from "lucide-react";
+import { Home, Compass, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type TabId = "home" | "lessons" | "achievements" | "profile";
@@ -10,17 +10,16 @@ interface BottomNavProps {
 
 const tabs = [
   { id: "home" as const, icon: Home, label: "Home" },
-  { id: "lessons" as const, icon: BookOpen, label: "Learn" },
-  { id: "achievements" as const, icon: Trophy, label: "Rewards" },
-  { id: "profile" as const, icon: User, label: "Profile" },
+  { id: "lessons" as const, icon: Compass, label: "Explore" },
+  { id: "profile" as const, icon: User, label: "You" },
 ];
 
 export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t border-border/50 px-4 py-2 pb-safe">
-      <div className="flex items-center justify-around max-w-lg mx-auto">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t border-border/30 px-6 py-3 pb-safe">
+      <div className="flex items-center justify-around max-w-md mx-auto">
         {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
+          const isActive = activeTab === tab.id || (activeTab === "achievements" && tab.id === "home");
           const Icon = tab.icon;
 
           return (
@@ -28,26 +27,22 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={cn(
-                "flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-200",
+                "flex flex-col items-center gap-1 px-6 py-2 rounded-xl transition-all duration-200",
                 isActive
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <div
-                className={cn(
-                  "p-2 rounded-xl transition-all duration-200",
-                  isActive && "gradient-primary shadow-button"
-                )}
-              >
-                <Icon
-                  className={cn(
-                    "w-5 h-5 transition-all",
-                    isActive && "text-primary-foreground"
-                  )}
-                />
-              </div>
-              <span className="text-[10px] font-display font-bold">{tab.label}</span>
+              <Icon className={cn(
+                "w-6 h-6 transition-all",
+                isActive && "scale-110"
+              )} />
+              <span className={cn(
+                "text-xs font-semibold",
+                isActive && "text-primary"
+              )}>
+                {tab.label}
+              </span>
             </button>
           );
         })}

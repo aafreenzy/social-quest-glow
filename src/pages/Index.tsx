@@ -1,63 +1,80 @@
-import { useState } from "react";
-import { ProgressHeader } from "@/components/ProgressHeader";
-import { LessonTree } from "@/components/LessonTree";
+import { useState, useEffect } from "react";
+import { SimpleHeader } from "@/components/SimpleHeader";
+import { SkillWorld } from "@/components/SkillWorld";
 import { ScenarioCard } from "@/components/ScenarioCard";
 import { BottomNav } from "@/components/BottomNav";
-import { BadgeCard } from "@/components/BadgeCard";
-import { DailyChallenge } from "@/components/DailyChallenge";
-import { ProgressBar } from "@/components/ProgressBar";
+import { GrowthCard } from "@/components/GrowthCard";
+import { MicroNudge } from "@/components/MicroNudge";
+import { Onboarding } from "@/components/Onboarding";
 import { Confetti } from "@/components/Confetti";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type View = "home" | "lesson" | "achievements" | "profile";
+type View = "onboarding" | "home" | "lesson" | "profile";
+
+const skills = [
+  { id: "greetings", title: "Greetings & Hellos", emoji: "👋", lessonsTotal: 3, lessonsCompleted: 2, isUnlocked: true, isCurrent: true },
+  { id: "smalltalk", title: "Small Talk", emoji: "💬", lessonsTotal: 4, lessonsCompleted: 0, isUnlocked: true, isCurrent: false },
+  { id: "conflict", title: "Handling Disagreements", emoji: "🤝", lessonsTotal: 3, lessonsCompleted: 0, isUnlocked: false, isCurrent: false },
+  { id: "networking", title: "Meeting New People", emoji: "🌟", lessonsTotal: 3, lessonsCompleted: 0, isUnlocked: false, isCurrent: false },
+  { id: "feedback", title: "Giving & Receiving Feedback", emoji: "💭", lessonsTotal: 3, lessonsCompleted: 0, isUnlocked: false, isCurrent: false },
+];
 
 const sampleScenario = {
-  scenario: "You bump into your coworker in the hallway. They say 'Hey! How's it going?' What's your best response?",
-  context: "Workplace Greetings",
+  scenario: "You bump into a coworker in the hallway. They say 'Hey! How's it going?'",
+  context: "Casual Greeting",
   emoji: "👋",
   choices: [
     {
       id: "a",
       text: "Fine.",
-      isCorrect: false,
-      feedback: "A bit short! Adding more shows you're open to conversation.",
+      effectiveness: "tricky" as const,
+      feedback: "Short responses can come across as uninterested. Try adding a bit more to keep the door open for connection.",
     },
     {
       id: "b",
-      text: "Hey! Pretty good, thanks! How about you?",
-      isCorrect: true,
-      feedback: "Perfect! You acknowledged them, answered positively, and showed interest by asking back.",
+      text: "Hey! Pretty good, thanks. How about you?",
+      effectiveness: "good" as const,
+      feedback: "This keeps things warm and shows you're open to chatting. The question back invites them to share too.",
     },
     {
       id: "c",
-      text: "*Keep walking and wave*",
-      isCorrect: false,
-      feedback: "A wave is friendly, but stopping briefly shows more engagement.",
+      text: "*Wave and keep walking*",
+      effectiveness: "okay" as const,
+      feedback: "Totally valid if you're in a rush! A quick wave acknowledges them. You could add a smile or quick 'Hey!' next time.",
     },
     {
       id: "d",
-      text: "I don't want to talk right now.",
-      isCorrect: false,
-      feedback: "While honesty is good, this could seem dismissive. A brief friendly response is better.",
+      text: "Not great, honestly.",
+      effectiveness: "okay" as const,
+      feedback: "Being honest is real. Depending on your relationship, this can deepen connection — or feel heavy for a hallway chat.",
     },
   ],
 };
 
-const badges = [
-  { name: "First Steps", description: "Complete your first lesson", icon: "🎯", isUnlocked: true, rarity: "common" as const },
-  { name: "Streak Master", description: "7 day streak", icon: "🔥", isUnlocked: true, rarity: "rare" as const },
-  { name: "Social Butterfly", description: "Complete all Greetings", icon: "🦋", isUnlocked: false, rarity: "epic" as const },
-  { name: "Legendary Networker", description: "Master all modules", icon: "👑", isUnlocked: false, rarity: "legendary" as const },
-];
-
 export default function Index() {
   const [activeTab, setActiveTab] = useState<"home" | "lessons" | "achievements" | "profile">("home");
-  const [view, setView] = useState<View>("home");
+  const [view, setView] = useState<View>("onboarding");
   const [showConfetti, setShowConfetti] = useState(false);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
-  const handleLessonComplete = (correct: boolean) => {
-    if (correct) {
+  // Check if user has seen onboarding
+  useEffect(() => {
+    const seen = localStorage.getItem("onboarding_complete");
+    if (seen) {
+      setHasCompletedOnboarding(true);
+      setView("home");
+    }
+  }, []);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem("onboarding_complete", "true");
+    setHasCompletedOnboarding(true);
+    setView("home");
+  };
+
+  const handleLessonComplete = (wasEffective: boolean) => {
+    if (wasEffective) {
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3500);
     }
@@ -67,77 +84,68 @@ export default function Index() {
     setActiveTab(tab);
     if (tab === "home") setView("home");
     else if (tab === "lessons") setView("home");
-    else if (tab === "achievements") setView("achievements");
     else if (tab === "profile") setView("profile");
+    else setView("home");
   };
+
+  if (view === "onboarding" && !hasCompletedOnboarding) {
+    return <Onboarding onComplete={handleOnboardingComplete} />;
+  }
 
   return (
     <div className="min-h-screen pb-24">
       <Confetti isActive={showConfetti} />
       
-      <ProgressHeader xp={1250} streak={7} hearts={5} level={12} />
+      <SimpleHeader name="Alex" />
 
-      {view === "home" && activeTab === "home" && (
-        <main className="px-4 py-6 max-w-lg mx-auto">
-          {/* Welcome Section */}
-          <div className="mb-6 animate-slide-up">
+      {view === "home" && (
+        <main className="px-5 py-6 max-w-lg mx-auto">
+          {/* Welcome - minimal */}
+          <div className="mb-8 animate-slide-up">
             <h1 className="font-display font-black text-2xl text-foreground mb-1">
-              Welcome back, Alex! 👋
+              Ready to practice? 
             </h1>
             <p className="text-muted-foreground font-body">
-              Ready to level up your social skills?
+              No pressure. Just pick a skill and try it out.
             </p>
           </div>
 
-          {/* Today's Progress */}
-          <div className="bg-card rounded-3xl p-5 shadow-card mb-6 animate-slide-up" style={{ animationDelay: "100ms" }}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display font-bold text-foreground">Today's Progress</h2>
-              <span className="text-xs font-bold text-secondary">2/5 lessons</span>
-            </div>
-            <ProgressBar value={2} max={5} variant="primary" size="lg" />
-            <div className="flex items-center gap-2 mt-3">
-              <Sparkles className="w-4 h-4 text-warning" />
-              <span className="text-sm text-muted-foreground">+50 XP earned today</span>
-            </div>
-          </div>
-
-          {/* Daily Challenge */}
-          <div className="mb-6" style={{ animationDelay: "200ms" }}>
-            <DailyChallenge
-              title="Quick Connector"
-              description="Complete 3 small talk scenarios"
-              progress={1}
-              goal={3}
-              xpReward={100}
-              timeLeft="4h 32m"
-              onStart={() => setView("lesson")}
+          {/* Micro Nudge - optional, gentle */}
+          <div className="mb-6 animate-slide-up" style={{ animationDelay: "100ms" }}>
+            <MicroNudge 
+              title="Quick idea"
+              description="Try saying 'hey' to someone today. That's it!"
             />
           </div>
 
-          {/* Continue Learning CTA */}
+          {/* Skills / Learning Path - THE HERO */}
+          <div className="mb-8 animate-slide-up" style={{ animationDelay: "150ms" }}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display font-bold text-foreground">Skills to explore</h2>
+            </div>
+            <SkillWorld 
+              skills={skills} 
+              onSkillClick={() => setView("lesson")} 
+            />
+          </div>
+
+          {/* Continue CTA */}
           <Button
             variant="default"
-            size="xl"
-            className="w-full mb-6 animate-slide-up"
-            style={{ animationDelay: "300ms" }}
+            size="lg"
+            className="w-full animate-slide-up"
+            style={{ animationDelay: "200ms" }}
             onClick={() => setView("lesson")}
           >
-            <Sparkles className="w-5 h-5 mr-2" />
-            Continue Learning
+            <Sparkles className="w-4 h-4 mr-2" />
+            Jump into practice
           </Button>
-
-          {/* Lesson Tree Preview */}
-          <div className="animate-slide-up" style={{ animationDelay: "400ms" }}>
-            <h2 className="font-display font-bold text-foreground mb-4">Your Journey</h2>
-            <LessonTree onLessonClick={() => setView("lesson")} />
-          </div>
         </main>
       )}
 
       {view === "lesson" && (
         <main className="py-4">
-          <div className="px-4 mb-4">
+          <div className="px-4 mb-2">
             <Button variant="ghost" size="sm" onClick={() => setView("home")}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
@@ -147,52 +155,28 @@ export default function Index() {
         </main>
       )}
 
-      {view === "achievements" && (
-        <main className="px-4 py-6 max-w-lg mx-auto">
-          <h1 className="font-display font-black text-2xl text-foreground mb-6 animate-slide-up">
-            Your Badges 🏆
-          </h1>
-          <div className="grid grid-cols-2 gap-4">
-            {badges.map((badge, i) => (
-              <div key={badge.name} className="animate-slide-up" style={{ animationDelay: `${i * 100}ms` }}>
-                <BadgeCard {...badge} />
-              </div>
-            ))}
-          </div>
-        </main>
-      )}
-
       {view === "profile" && (
-        <main className="px-4 py-6 max-w-lg mx-auto">
-          <div className="flex flex-col items-center animate-slide-up">
-            <div className="w-24 h-24 rounded-full gradient-hero flex items-center justify-center text-5xl shadow-glow mb-4">
-              😎
+        <main className="px-5 py-6 max-w-lg mx-auto">
+          <div className="flex flex-col items-center mb-8 animate-slide-up">
+            <div className="w-20 h-20 rounded-2xl gradient-primary flex items-center justify-center text-4xl shadow-card mb-4">
+              😊
             </div>
-            <h1 className="font-display font-black text-2xl text-foreground">Alex</h1>
-            <p className="text-muted-foreground mb-6">Level 12 Social Star</p>
-
-            <div className="w-full bg-card rounded-3xl p-5 shadow-card">
-              <h2 className="font-display font-bold text-foreground mb-4">Stats</h2>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Total XP</span>
-                  <span className="font-bold text-secondary">1,250</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Current Streak</span>
-                  <span className="font-bold text-highlight">7 days 🔥</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Lessons Completed</span>
-                  <span className="font-bold text-success">24</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Badges Earned</span>
-                  <span className="font-bold text-accent">2/15</span>
-                </div>
-              </div>
-            </div>
+            <h1 className="font-display font-bold text-xl text-foreground">Alex</h1>
+            <p className="text-muted-foreground text-sm">Exploring social skills</p>
           </div>
+
+          {/* Growth Card - trends not scores */}
+          <div className="animate-slide-up" style={{ animationDelay: "100ms" }}>
+            <GrowthCard 
+              practiceStreak={7}
+              totalPracticed={24}
+              skillsExplored={2}
+            />
+          </div>
+
+          <p className="text-center text-xs text-muted-foreground mt-8">
+            You're building something. Keep going at your own pace.
+          </p>
         </main>
       )}
 
