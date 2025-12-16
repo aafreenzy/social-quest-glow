@@ -6,66 +6,66 @@
 
 @layer base {
   :root {
-    /* Vibrant Social Learning Palette */
-    --background: 260 30% 98%;
-    --foreground: 260 50% 15%;
+    /* Vibrant Social Learning Palette - Enhanced Contrast */
+    --background: 260 25% 97%;
+    --foreground: 260 40% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 260 50% 15%;
+    --card-foreground: 260 40% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 260 50% 15%;
+    --popover-foreground: 260 40% 12%;
 
-    /* Primary - Vibrant Purple */
-    --primary: 270 80% 60%;
+    /* Primary - Vibrant Purple (slightly deeper) */
+    --primary: 270 75% 55%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 270 100% 75%;
+    --primary-glow: 270 90% 70%;
 
     /* Secondary - Electric Blue */
-    --secondary: 210 90% 55%;
+    --secondary: 210 85% 50%;
     --secondary-foreground: 0 0% 100%;
 
     /* Accent - Hot Pink */
-    --accent: 330 90% 60%;
+    --accent: 330 85% 55%;
     --accent-foreground: 0 0% 100%;
 
-    /* Highlight - Energetic Orange */
-    --highlight: 25 95% 55%;
+    /* Highlight - Warm Orange */
+    --highlight: 25 90% 52%;
     --highlight-foreground: 0 0% 100%;
 
-    /* Success - Mint Green */
-    --success: 160 70% 45%;
+    /* Success - Teal (softer, not harsh green) */
+    --success: 165 55% 42%;
     --success-foreground: 0 0% 100%;
 
-    /* Warning - Sunny Yellow */
-    --warning: 45 95% 55%;
-    --warning-foreground: 45 100% 15%;
+    /* Warning - Golden Yellow */
+    --warning: 42 90% 50%;
+    --warning-foreground: 42 100% 12%;
 
-    --muted: 260 20% 92%;
-    --muted-foreground: 260 15% 45%;
+    --muted: 260 15% 90%;
+    --muted-foreground: 260 15% 40%;
 
-    --destructive: 0 80% 60%;
+    --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 260 25% 88%;
-    --input: 260 25% 88%;
-    --ring: 270 80% 60%;
+    --border: 260 20% 85%;
+    --input: 260 20% 85%;
+    --ring: 270 75% 55%;
 
     --radius: 1rem;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(270, 80%, 60%), hsl(210, 90%, 55%));
-    --gradient-accent: linear-gradient(135deg, hsl(330, 90%, 60%), hsl(25, 95%, 55%));
-    --gradient-success: linear-gradient(135deg, hsl(160, 70%, 45%), hsl(180, 60%, 50%));
-    --gradient-hero: linear-gradient(145deg, hsl(270, 80%, 60%), hsl(330, 90%, 60%), hsl(25, 95%, 55%));
-    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 100%), hsl(260, 30%, 98%));
-    --gradient-bg: linear-gradient(180deg, hsl(260, 40%, 96%), hsl(270, 35%, 92%));
+    /* Gradients - More vibrant */
+    --gradient-primary: linear-gradient(135deg, hsl(270, 75%, 55%), hsl(210, 85%, 50%));
+    --gradient-accent: linear-gradient(135deg, hsl(330, 85%, 55%), hsl(25, 90%, 52%));
+    --gradient-success: linear-gradient(135deg, hsl(165, 55%, 42%), hsl(180, 50%, 45%));
+    --gradient-hero: linear-gradient(145deg, hsl(270, 75%, 55%), hsl(330, 85%, 55%), hsl(25, 90%, 52%));
+    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 100%), hsl(260, 25%, 97%));
+    --gradient-bg: linear-gradient(180deg, hsl(260, 30%, 96%), hsl(270, 25%, 93%));
 
-    /* Shadows */
-    --shadow-card: 0 8px 30px -8px hsl(270 80% 60% / 0.25);
-    --shadow-button: 0 6px 20px -4px hsl(270 80% 60% / 0.4);
-    --shadow-glow: 0 0 40px hsl(270 100% 75% / 0.3);
-    --shadow-success: 0 6px 20px -4px hsl(160 70% 45% / 0.4);
+    /* Shadows - Softer, more refined */
+    --shadow-card: 0 4px 20px -4px hsl(270 60% 50% / 0.15);
+    --shadow-button: 0 4px 16px -3px hsl(270 75% 55% / 0.35);
+    --shadow-glow: 0 0 30px hsl(270 90% 70% / 0.25);
+    --shadow-success: 0 4px 16px -3px hsl(165 55% 42% / 0.35);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
